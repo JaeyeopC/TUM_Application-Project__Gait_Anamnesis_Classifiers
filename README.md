@@ -13,6 +13,23 @@ The objective of this project was to develop machine learning models that link b
 
 ---
 
+## Repository Structure
+
+The repository is organized into dedicated branches to separate documentation, model development, and finalized implementations.
+
+- **main**  
+  Contains the final project report and documentation.
+
+- **LSTM_final_models**  
+  Includes the implemented and trained models based on LSTM architectures for gait event detection and pain anamnesis classification.
+
+- **XGBoost_final_models**  
+  Contains the finalized XGBoost models, including trained models and evaluation outputs.
+
+- **XGBoost_Gait_Experiment**  
+  Development and experimentation branch for XGBoost-based gait event detection, including feature engineering, model tuning, and exploratory analysis.
+---
+
 ## Data
 
 Two structured datasets were used:
@@ -38,7 +55,6 @@ It includes:
 
 This dataset enables modeling both the presence and intensity of pain.
 
----
 
 ## Methods
 
@@ -54,26 +70,10 @@ This multi-task learning framework captures relationships between biomechanical 
 
 To improve model interpretability, explainable AI techniques were applied. In particular, **SHAP (SHapley Additive exPlanations)** was used to analyze feature contributions and identify biomechanical factors most strongly associated with specific pain outcomes. This enabled transparent interpretation of model predictions and supported clinically meaningful insights.
 
----
 
 ## Outcome
 
 The project compares deep learning and tree-based approaches in terms of predictive performance, interpretability, and practical deployment potential.  
 Results show that data-driven modeling can reliably detect gait events, provide meaningful predictions of patient-reported pain, and offer interpretable insights into biomechanical risk factors, supporting the development of automated and scalable clinical assessment tools.
 
-## Repository Structure
-
-The repository is organized into dedicated branches to separate documentation, model development, and finalized implementations.
-
-- **main**  
-  Contains the final project report and documentation.
-
-- **LSTM_final_models**  
-  Includes the implemented and trained models based on LSTM architectures for gait event detection and pain anamnesis classification.
-
-- **XGBoost_final_models**  
-  Contains the finalized XGBoost models, including trained models and evaluation outputs.
-
-- **XGBoost_Gait_Experiment**  
-  Development and experimentation branch for XGBoost-based gait event detection, including feature engineering, model tuning, and exploratory analysis.
-
+---
