@@ -166,6 +166,12 @@ Interpretation:
 
 ---
 
+# Task: Gait Event Detection
+The goal of this task is to classify gait events from IMU time-series signals.
+Two different modeling approaches were implemented.
+
+---
+
 ## XGBoost
 
 ### Method
