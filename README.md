@@ -1,242 +1,199 @@
-
-# Gait Event Detection & Pain Anamnesis Classification (TUM Application Project)
+# Gait Event Detection & Pain Anamnesis Classification
 
 ## Project Overview
-This project implements and compares machine learning models that:
-- Detect **gait events** from wearable **6‑axis IMU sensor time‑series data** (accelerometer + gyroscope).
-- Predict **pain anamnesis outcomes** (binary and ordinal) using **biomechanical features derived from gait**.
 
-Two modeling approaches were developed and compared:
-- **LSTM (sequence modeling)** for time‑series gait event detection.
-- **XGBoost (lagged feature approach)** for structured time‑series learning.
+This project was conducted as part of the TUM Application Project.  
+It investigates machine learning approaches for two related healthcare tasks:
 
-The repository separates final artifacts (reports, notebooks, trained models, and experiment results) into different branches.
+1. **Gait Event Detection** using IMU sensor time-series data  
+2. **Pain Anamnesis Classification** using biomechanical gait-derived features  
 
----
+Two modeling strategies were implemented and compared:
 
-## Repository Branches
-- **LSTM_final_models**
-  - LSTM-based gait event classification
-  - Neural network models for pain anamnesis prediction (binary and multi-task)
-  - Includes notebooks and data files
+- **XGBoost (tree-based gradient boosting)**
+- **LSTM / Deep Neural Networks**
 
-- **XGBoost_final_models**
-  - Final XGBoost models for gait event detection and pain anamnesis
-  - Optuna hyperparameter tuning
-  - Saved models and evaluation reports
+The detailed experimental results are documented in the final report. :contentReference[oaicite:0]{index=0}
 
-- **XGBoost_Gait_Experiment**
-  - Experimental branch for feature engineering and tuning experiments for gait event detection
 
 ---
 
-## Project Objectives
+# Data
 
-### 1. Gait Event Detection
-Classify gait events from **IMU sensor signals embedded in shoe insoles**.
+## 1. Gait Event Dataset
 
-Target classes include:
-- Heel Strike
-- Foot Flat
-- Heel Off
-- Toe Off
+- **Sensor**: 6-axis IMU (3-axis accelerometer + 3-axis gyroscope)  
+- **Sampling Rate**: ~100–200 Hz  
+- **Size**:  
+  - 2,324 collection IDs  
+  - 508,446 rows  
 
-### 2. Pain Anamnesis Classification
-Predict patient pain questionnaire results using **7 biomechanical features extracted from gait**.
+Each row includes:
 
-Targets include:
-- **18 binary pain indicators (CLP)**
-- **24 ordinal pain severity variables (0–5 scale)**
+- collection ID  
+- timestamp  
+- 6 sensor measurements  
+- foot side (L/R)  
+- step number  
+- gait event label  
 
----
+### Gait Event Labels
 
-## Datasets
+| Label | Event |
+|-------|-------|
+| 0 | No Event |
+| 1 | Heel Strike |
+| 2 | Foot Flat |
+| 3 | Heel Off |
+| 4 | Toe Off |
 
-### Gait Event Dataset
-- **2,324 collection IDs**
-- **508,446 rows**
-- **8 columns** including:
-  - collection_id
-  - timestamps
-  - 6‑axis IMU sensor measurements
-  - gait phase labels
-
-Class distribution:
-
-| Event | Count |
-|------|------|
-| No Event | 1,806 |
-| Heel Strike | 44,230 |
-| Foot Flat | 175,126 |
-| Heel Off | 97,929 |
-| Toe Off | 189,335 |
-
-The dataset is **highly imbalanced**.
-
-### Pain Anamnesis Dataset
-- **2,603 patient records**
-- **7 input features**
-- **42 targets**
-  - 18 binary
-  - 24 ordinal (0–5 scale)
-
-637 records contain missing values.
+These labels were generated using proprietary signal-processing algorithms.
 
 ---
 
-## Feature Engineering
+## 2. Pain Anamnesis Dataset
 
-### LSTM Pipeline
-- Continuous IMU streams segmented into **sequence windows**
-- Example window length: **30 timesteps**
-- Inputs:
-  - 3-axis gyroscope
-  - 3-axis accelerometer
-- **Min‑Max normalization**
-- Sequence classification using the final timestep label
+- **Total patients**: 2,603  
+- **Input features**: 7 biomechanical gait features  
+  - e.g., lateral deviations, heel strike timing, shoe size  
 
-### XGBoost Pipeline
-Time‑series data transformed into supervised learning features.
+### Target Variables (42 total)
 
-Key idea:
+- **18 Binary variables** → localized pain presence (0/1)  
+- **24 Ordinal variables** → pain severity (0–5 scale)  
 
-event(t) = function(sensor(t), sensor(t−1), ... sensor(t−19))
-
-Steps:
-1. Remove missing values
-2. Remove **No Event** samples
-3. Convert labels to 4‑class classification
-4. Determine lag size using **Autocorrelation Function (ACF)**
-5. Final lag size: **19**
-
-Feature count:
-
-6 sensors × 19 lags ≈ **114 lagged features**
+The dataset allows simultaneous prediction of pain presence and severity.
 
 ---
 
-## Models
+# Task: Gait Event Detection
 
-### LSTM Gait Event Classifier
-
-Architecture:
-- 3 LSTM layers
-- Hidden dimension: 128
-- Dropout: 0.5
-- Fully connected output layer
-
-Training setup:
-- Train / Validation / Test split: **70 / 15 / 15**
-- Batch size: **128**
-- Learning rate: **0.001**
-- Optimizer: **Adam**
-- Epochs: **10**
+Goal: Classify gait phase from IMU time-series signals.
 
 ---
 
-### XGBoost Gait Event Model
+## XGBoost
 
-Model:
+### Method
 
-XGBClassifier(
-objective="multi:softmax",
-eval_metric="mlogloss"
-)
+Instead of using raw sequences, we transformed time-series data into tabular form using **lag-based feature engineering**.
 
-Hyperparameter tuning:
-- **Optuna TPE sampler**
-- **50 trials**
-- Best validation accuracy ≈ **0.914**
+- Autocorrelation (ACF) used to determine optimal lag size  
+- Past sensor values added as lag features  
+- MinMax scaling applied  
+- GroupShuffleSplit used to avoid leakage across collection IDs  
 
-Key parameters tuned:
-- max_depth
-- learning_rate
-- n_estimators
-- subsample
-- colsample_bytree
-- gamma
-- min_child_weight
+### Hyperparameter Optimization
 
----
+- **Optuna** used for automated hyperparameter search  
+  - max_depth  
+  - learning_rate  
+  - n_estimators  
+  - subsample  
+  - colsample_bytree  
 
-### Neural Networks for Pain Anamnesis
+### Model Interpretation
 
-Two architectures were tested.
-
-#### Binary‑Only Neural Network
-- 7 hidden layers
-- BatchNorm + LeakyReLU + Dropout
-- Optimizer: AdamW
-- Epochs: 50
-
-#### Multi‑Task Neural Network
-Shared trunk + multiple output heads.
-
-Components:
-- Shared layers (64 → 32 → 32)
-- Binary classification head
-- Ordinal regression heads using **CORAL method**
-
-Loss function:
-- Binary Cross‑Entropy
-- CORAL ordinal loss
+- **SHAP analysis** used to interpret feature importance  
+- Identified which sensor axes and lag steps contributed most to event prediction  
 
 ---
 
-## Results
+## LSTM
 
-### Gait Event Detection
+### Method
 
-| Model | Accuracy | Notes |
-|------|------|------|
-| LSTM | ~0.91 | Rare classes difficult |
-| XGBoost | ~0.921 | Best overall performance |
+Raw IMU sequences were directly used as input to an LSTM network.
 
-Heel Strike remained the hardest class due to imbalance.
+- Sliding window segmentation (2–3 seconds per window)  
+- MinMax normalization  
+- Sequence labeling approach  
 
-### Pain Anamnesis Prediction
+### Architecture
 
-| Model | Binary Accuracy | Additional Metric |
-|------|------|------|
-| Binary NN | ~0.78 | — |
-| Multi‑Task NN | ~0.80 | MAE ≈ 1.4 |
-| XGBoost | mean accuracy ≈ 0.668 | mean F1 ≈ 0.285 |
+- 3 stacked LSTM layers  
+- 128 hidden units each  
+- Dropout for regularization  
+- Fully connected softmax output  
 
-Performance varied significantly between targets.
+### Training
 
----
+- Optimizer: Adam (lr=0.001)  
+- 70/15/15 train-validation-test split  
+- Early stopping  
 
-## Limitations
+### Result
 
-1. **Class imbalance**
-   - Rare gait events reduce recall.
-
-2. **Preprocessing artifacts not saved**
-   - Scalers and encoders were not stored with the models.
-
-3. **Data split differences**
-   - XGBoost used group‑based splitting.
-   - LSTM used random splits, which may risk data leakage.
-
-4. **Limited features**
-   - Only 7 biomechanical inputs for predicting 42 pain targets.
+- ~91% overall test accuracy  
+- Strong performance on frequent classes (Foot Flat, Toe Off)  
+- Lower recall for rare class (Heel Strike)
 
 ---
 
-## Future Work
+# Task: Pain Anamnesis Classification
 
-Recommended improvements:
-
-1. Save **scalers and encoders** with model checkpoints.
-2. Improve **rare class detection** using resampling or weighted loss.
-3. Use **group‑based splitting** consistently.
-4. Expand biomechanical features for pain prediction.
+Goal: Predict patient pain profile using gait-derived features.
 
 ---
 
-## Repository
+## XGBoost
 
-GitHub:
-https://github.com/JaeyeopC/TUM_Application-Project__Gait_Anamnesis_Classifiers
+### Method
 
-This repository contains the notebooks, datasets, and trained models used in the TUM Application Project.
+- Structured 7 biomechanical features used as input  
+- Each pain target modeled independently  
+- Ordinal variables optionally converted to binary for analysis  
+- Standardization applied  
+
+### Hyperparameter Optimization
+
+- **Optuna** used for tuning each target model  
+- Threshold optimization applied for better class balance  
+
+### Model Interpretation
+
+- **SHAP summary plots and dependence plots** used  
+- Identified biomechanical features influencing specific pain regions  
+- Provided interpretable relationships between gait deviations and pain  
+
+---
+
+## LSTM / Multi-Output Neural Network
+
+Since pain inputs are structured (not sequential), a **multi-output neural network** was used.
+
+### Input
+
+- 7 biomechanical gait features  
+
+### Architecture
+
+- Shared dense trunk (64 → 32 → 32)  
+- Two output branches:
+  - 18 binary outputs (sigmoid)
+  - 24 ordinal outputs using **CORAL** method  
+
+### Training
+
+- Binary Cross Entropy for binary tasks  
+- CORAL-based ordinal loss  
+- Multi-task loss balancing  
+- Adam optimizer  
+
+### Results
+
+- ~80% multi-label binary accuracy  
+- ~1.4 MAE for ordinal pain severity  
+- Multi-task learning improved consistency and performance  
+
+---
+
+# Summary
+
+- **LSTM** performs strongly for sequential gait event detection  
+- **XGBoost + lag features** provides competitive performance with high interpretability  
+- **Optuna** improves model performance through automated tuning  
+- **SHAP** enables clinical interpretability of gait–pain relationships  
+- Multi-task neural networks effectively handle mixed binary + ordinal outputs  
+
+This project demonstrates how wearable gait data can be leveraged to build automated, interpretable healthcare prediction systems.
