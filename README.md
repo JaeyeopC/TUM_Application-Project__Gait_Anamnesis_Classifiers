@@ -120,8 +120,7 @@ This allows the model to predict both **pain presence and pain intensity** simul
 Among the **2,603 records**:
 
 - **637 samples contain missing values**
-  - either in the pain targets
-  - or in the shoe size feature
+  - either in the pain targets or in the shoe size feature
 
 These records were handled during preprocessing depending on the modeling experiment.
 
