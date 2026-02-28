@@ -279,10 +279,10 @@ The XGBoost model was applied to structured biomechanical gait features to predi
 - **7 biomechanical gait features** were used as input variables.
 - A total of **42 pain-related targets** were modeled, and each pain variable was trained as an **independent binary classification model**.
 - To manage the large number of targets efficiently, a **custom wrapper class was implemented to train and manage multiple XGBoost models within a unified framework**.
-- Ordinal pain scores (0–5) were converted into **binary indicators (pain vs. no pain)** to simplify the prediction task.
+- Ordinal pain scores (0–5) were converted into **binary indicators (pain vs. no pain)** to reduce the complexity of the relationship between input variables and target variables.
 - Feature standardization was applied before training.
 
-This approach allows multiple pain prediction tasks to be handled within a single modeling pipeline while keeping each model specialized for its corresponding target variable. :contentReference[oaicite:0]{index=0}
+This approach allows multiple pain prediction tasks to be handled within a single modeling pipeline while keeping each model specialized for its corresponding target variable.
 
 ### Hyperparameter Optimization
 
