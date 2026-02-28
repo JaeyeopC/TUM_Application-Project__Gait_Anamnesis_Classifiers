@@ -213,6 +213,7 @@ Distribution shift analysis (**Jensen–Shannon Divergence, JSD**) was used to q
 - JSD including Heel Strike: **0.12**
 
 This result indicates that most distribution mismatch is caused by the Heel Strike phase, while the remaining gait phases are predicted with highly similar distributions.
+
 ---
 
 ## LSTM
@@ -253,10 +254,9 @@ Performance characteristics:
 Compared to the XGBoost approach, the LSTM model directly learns temporal dependencies from raw IMU sequences, which allows it to achieve competitive performance without manual lag feature engineering.
 
 ---
-
 # Task: Pain Anamnesis Classification
 
-Goal: Predict patient pain profile using gait-derived features.
+Goal: Predict patient pain profile using gait-derived biomechanical features.
 
 ---
 
@@ -264,51 +264,88 @@ Goal: Predict patient pain profile using gait-derived features.
 
 ### Method
 
-- Structured 7 biomechanical features used as input  
-- Each pain target modeled independently  
-- Ordinal variables optionally converted to binary for analysis  
-- Standardization applied  
+The XGBoost model was applied to structured biomechanical gait features to predict pain-related targets.
+
+- **7 biomechanical gait features** used as input  
+- Each pain variable modeled as an **independent classification task**  
+- Ordinal pain scores (0–5) converted to **binary indicators (pain vs. no pain)** to simplify the prediction task  
+- **Feature standardization** applied before training  
+
+This approach enables interpretable models while handling multiple pain prediction tasks independently.
 
 ### Hyperparameter Optimization
 
-- **Optuna** used for tuning each target model  
-- Threshold optimization applied for better class balance  
+Hyperparameters were optimized using **Optuna**, which performs efficient Bayesian optimization using the **Tree-structured Parzen Estimator (TPE)** sampler.
+
+Key hyperparameters tuned include:
+
+- `max_depth`
+- `learning_rate`
+- `n_estimators`
+- `subsample`
+- `colsample_bytree`
+- `scale_pos_weight`
+
+Additionally, **decision threshold optimization** was applied for each pain target to improve classification performance under class imbalance.
+
+Instead of using the default probability threshold (**0.5**), the optimal threshold was selected using **Youden’s J statistic**, defined as:
+
+J = Sensitivity + Specificity − 1
+
+The threshold that maximized **Youden’s J** on the validation set was chosen for each pain variable.  
+This approach identifies the decision boundary that best balances **true positive rate (sensitivity)** and **true negative rate (specificity)**, which is particularly useful in medical classification tasks.
 
 ### Model Interpretation
 
-- **SHAP summary plots and dependence plots** used to
-- Identify biomechanical features influencing specific pain regions  
-- Provide interpretable relationships between gait deviations and pain  
+To interpret the trained models, **SHAP (SHapley Additive exPlanations)** was used.
+
+- **SHAP summary plots** were used to visualize global feature importance.
+- **SHAP dependence plots** were used to analyze relationships between biomechanical features and pain predictions.
+
+This analysis helped identify which gait deviations contribute most strongly to specific pain regions and provided interpretable insights into the model behavior.
 
 ---
 
 ## LSTM / Multi-Output Neural Network
 
-Since pain inputs are structured (not sequential), a **multi-output neural network** was used.
+Since the pain anamnesis dataset consists of structured biomechanical features rather than time-series sequences, a **multi-output neural network** was used instead of a recurrent LSTM model.
 
 ### Input
 
-- 7 biomechanical gait features  
+- **7 biomechanical gait features**
 
 ### Architecture
 
-- Shared dense trunk (64 → 32 → 32)  
-- Two output branches:
-  - 18 binary outputs (sigmoid)
-  - 24 ordinal outputs using **CORAL** method  
+The neural network was designed as a **multi-task learning model** with shared feature extraction layers.
+
+- Shared dense trunk: **64 → 32 → 32**
+
+Two output branches were used:
+
+Binary pain prediction:
+- **18 binary outputs**
+- Sigmoid activation
+
+Ordinal pain severity prediction:
+- **24 ordinal outputs**
+- Implemented using the **CORAL (Cumulative Ordinal Regression with Logistic models)** framework
+
+This architecture allows the model to simultaneously learn **pain presence** and **pain severity**.
 
 ### Training
 
-- Binary Cross Entropy for binary tasks  
-- CORAL-based ordinal loss  
-- Multi-task loss balancing  
-- Adam optimizer  
+The model was trained using a multi-task loss function combining binary and ordinal objectives.
+
+- **Binary Cross Entropy** for binary targets
+- **CORAL-based ordinal regression loss** for severity prediction
+- **Adam optimizer**
+- Multi-task loss balancing to stabilize training
 
 ### Results
 
-- ~80% multi-label binary accuracy  
-- ~1.4 MAE for ordinal pain severity  
-- Multi-task learning improved consistency and performance  
+The multi-task neural network achieved the following performance:
 
+- **Binary pain prediction accuracy:** ~80%
+- **Ordinal pain severity prediction:** ~1.4 MAE
 
-This project demonstrates how wearable gait data can be leveraged to build automated, interpretable healthcare prediction systems.
+Compared to single-task models, the multi-task approach improved prediction consistency by allowing the model to jointly learn relationships between pain presence and pain severity across different body regions.
