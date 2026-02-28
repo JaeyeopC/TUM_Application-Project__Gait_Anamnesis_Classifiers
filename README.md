@@ -294,8 +294,8 @@ Key observations from the optimization results:
 
 - `max_depth` was typically optimized to **≈ 4**, controlling model complexity and preventing overfitting.
 - `n_estimators` centered around **≈ 655 trees**, with values ranging from **339 to 799** across different target models.
-- `learning_rate`, `subsample`, and `colsample_bytree` were tuned within predefined ranges to balance model stability and generalization.
-- `scale_pos_weight` was adjusted to compensate for **imbalanced pain labels**.
+- `learning_rate` had a **median value of ≈ 0.048**, while `subsample` and `colsample_bytree` were typically around **≈ 0.892** and **≈ 0.776**, respectively, balancing model stability and generalization.
+- `scale_pos_weight` ranged from **1 to 9** with a **median of ≈ 3**, compensating for **imbalanced pain labels**.
 
 In addition to hyperparameter tuning, **decision threshold optimization** was performed.
 
