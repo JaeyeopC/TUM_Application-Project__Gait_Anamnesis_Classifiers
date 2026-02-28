@@ -2,8 +2,11 @@
 
 ## Project Overview
 
-This project was conducted as part of the TUM Application Project.  
-It investigates machine learning approaches for two related healthcare tasks:
+This project was conducted as part of the TUM Application Project in association with an industry partner.
+The main objective was to develop **baseline machine learning models** for two related healthcare tasks:
+
+1. **Gait Event Detection** using IMU sensor time-series data  
+2. **Pain Anamnesis Classification** using biomechanical gait-derived features
 
 1. **Gait Event Detection** using IMU sensor time-series data  
 2. **Pain Anamnesis Classification** using biomechanical gait-derived features  
@@ -369,3 +372,7 @@ The multi-task neural network achieved the following performance:
 - **Ordinal pain severity prediction:** ~1.4 MAE
 
 Compared to single-task models, the multi-task approach improved prediction consistency by allowing the model to jointly learn relationships between pain presence and pain severity across different body regions.
+
+
+Both the XGBoost and neural network approaches showed limited predictive performance for the pain anamnesis task. This is likely because the direct statistical relationships between the gait-derived variables and pain targets are weak, as indicated by the low pairwise correlations observed during exploratory analysis. 
+Additionally, the relationship between biomechanical gait features and reported pain may be highly complex and multi-factorial, making it difficult for standard models to capture meaningful patterns with the available features. Future work should therefore focus on analyzing model behavior using explainable AI techniques such as SHAP, which can help uncover hidden feature interactions and guide improvements in feature engineering or model design.
