@@ -28,7 +28,7 @@ Before training the models, exploratory data analysis (EDA) was conducted to und
 - Total rows: **508,446**
 - Collection IDs: **2,324**
 
-Each **collection ID represents one walking session**, meaning multiple rows together form a continuous IMU time-series sequence recorded from the same participant. :contentReference[oaicite:1]{index=1}
+Each **collection ID represents one walking session**, meaning multiple rows together form a continuous IMU time-series sequence recorded from the same participant. 
 
 Each observation includes:
 
@@ -111,7 +111,7 @@ Targets consist of:
 - **24 ordinal variables**
   - represent pain severity on a **0–5 scale**
 
-This allows the model to predict both **pain presence and pain intensity** simultaneously. :contentReference[oaicite:2]{index=2}
+This allows the model to predict both **pain presence and pain intensity** simultaneously. 
 
 ---
 
