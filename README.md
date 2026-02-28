@@ -70,7 +70,7 @@ The pain anamnesis dataset contains **patient-reported pain information together
 Targets include:
 
 - **18 binary variables**
-  - indicate presence of localized pain
+  - indicate presence of localized pain (Binary)
 
 - **24 ordinal variables**
   - represent pain severity on a **0–5 scale**
