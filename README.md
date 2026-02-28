@@ -18,37 +18,96 @@ The detailed experimental results are documented in the final report. :contentRe
 
 ---
 
-# Data
+## Exploratory Data Analysis (EDA)
 
-## 1. Gait Event Dataset
+### Gait Event Dataset
 
-- **Sensor**: 6-axis IMU (3-axis accelerometer + 3-axis gyroscope)  
-- **Sampling Rate**: ~100–200 Hz  
-- **Size**:  
-  - 2,324 collection IDs  
-  - 508,446 rows  
+Before building the models, an exploratory analysis was conducted to understand the structure and characteristics of the IMU sensor data.
 
-Each row includes:
+**Dataset structure**
 
-- collection ID  
-- timestamp  
-- 6 sensor measurements  
-- foot side (L/R)  
-- step number  
-- gait event label  
+- Total rows: **508,446**
+- Collection IDs: **2,324**
+- Each **collection ID corresponds to one walking session**, meaning multiple rows form a continuous time-series sequence. :contentReference[oaicite:0]{index=0}
 
-### Gait Event Labels
+Each observation contains:
 
-| Label | Event |
-|-------|-------|
-| 0 | No Event |
-| 1 | Heel Strike |
-| 2 | Foot Flat |
-| 3 | Heel Off |
-| 4 | Toe Off |
+- 3-axis accelerometer data
+- 3-axis gyroscope data
+- timestamp
+- foot side (left/right)
+- step information
+- gait event label
 
-These labels were generated using proprietary signal-processing algorithms.
+**Class distribution**
 
+The dataset contains five gait event labels:
+
+- 0 — No Event  
+- 1 — Heel Strike  
+- 2 — Foot Flat  
+- 3 — Heel Off  
+- 4 — Toe Off  
+
+The distribution is highly imbalanced.  
+Foot Flat and Toe Off appear most frequently, while Heel Strike is relatively rare.  
+This imbalance later influenced model performance, particularly for the Heel Strike class.
+
+**Temporal characteristics**
+
+Because the dataset consists of time-series sensor data, temporal dependency between observations was analyzed using the **Autocorrelation Function (ACF)**.
+
+The average cutoff lag across collection IDs was approximately **19 time steps**, indicating that recent sensor history strongly affects the current gait phase.  
+This finding motivated the creation of **lag-based features** for the XGBoost model. :contentReference[oaicite:1]{index=1}
+
+
+---
+
+### Pain Anamnesis Dataset
+
+The pain anamnesis dataset contains **patient-reported pain information together with gait-derived biomechanical features**.
+
+**Dataset structure**
+
+- Total records: **2,603 patients**
+- Input features: **7 biomechanical gait features**
+- Targets: **42 pain-related variables**
+
+Targets include:
+
+- **18 binary variables**
+  - indicate presence of localized pain
+
+- **24 ordinal variables**
+  - represent pain severity on a **0–5 scale**
+
+This allows modeling both **pain presence and pain severity** simultaneously. :contentReference[oaicite:2]{index=2}
+
+**Feature distributions**
+
+Most biomechanical features show approximately **Gaussian-like distributions**, while **shoe size** is a discrete variable.
+
+Examples of features include:
+
+- lateral deviation during walking
+- static standing deviation
+- heel strike timing
+- shoe size
+
+**Missing values**
+
+Among the 2,603 records, **637 samples contain missing values** in either the target variables or the shoe size feature.  
+These missing values were handled during preprocessing depending on the experiment setup. :contentReference[oaicite:3]{index=3}
+
+
+**Feature–target relationships**
+
+Correlation analysis between gait features and pain outcomes showed that:
+
+- Individual features have **low pairwise correlations (< 0.3)** with pain variables.
+- Pain prediction likely depends on **complex interactions between multiple features** rather than a single dominant variable.
+
+This observation motivated the use of **machine learning models capable of capturing nonlinear relationships**, such as XGBoost and neural networks.
 ---
 
 ## 2. Pain Anamnesis Dataset
