@@ -182,7 +182,7 @@ Instead of using raw sequences, we transformed time-series data into tabular for
 - **Optuna** was used for resource-efficient hyperparameter optimization based on Bayesian optimization.  
   Instead of performing exhaustive grid search, Optuna explores the search space adaptively by learning from previous trials and focusing on promising regions.
 
-The following hyperparameters were tuned:
+The following hyperparameters were selected and tuned:
 
   - `max_depth`  
     Controls the maximum depth of individual trees, balancing model complexity and overfitting.
