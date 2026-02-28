@@ -21,9 +21,9 @@ The detailed experimental results are documented in the final report.
 
 Before training the models, exploratory data analysis (EDA) was conducted to understand the statistical properties of the datasets and identify patterns relevant for modeling.
 
-## Gait Event Dataset
+### Gait Event Dataset
 
-### Dataset Structure
+#### Dataset Structure
 
 - Total rows: **508,446**
 - Collection IDs: **2,324**
@@ -40,7 +40,7 @@ Each observation includes:
 
 ---
 
-### Class Distribution
+#### Class Distribution
 
 The dataset contains five gait event classes:
 
@@ -72,7 +72,7 @@ This class imbalance explains why some models showed weaker performance on the *
 
 ---
 
-### Temporal Dependency Analysis
+#### Temporal Dependency Analysis
 
 Because the dataset consists of time-series sensor signals, the **Autocorrelation Function (ACF)** was used to analyze temporal dependencies.
 
@@ -95,9 +95,9 @@ After lag generation:
 
 ---
 
-## Pain Anamnesis Dataset
+### Pain Anamnesis Dataset
 
-### Dataset Structure
+#### Dataset Structure
 
 - Total records: **2,603 patients**
 - Input features: **7 biomechanical gait features**
@@ -115,7 +115,7 @@ This allows the model to predict both **pain presence and pain intensity** simul
 
 ---
 
-### Missing Values
+#### Missing Values
 
 Among the **2,603 records**:
 
@@ -127,7 +127,7 @@ These records were handled during preprocessing depending on the modeling experi
 
 ---
 
-### Feature Distribution
+#### Feature Distribution
 
 Descriptive statistics were computed for all biomechanical features.
 
@@ -143,7 +143,7 @@ Therefore:
 
 ---
 
-### Feature–Target Correlation Analysis
+#### Feature–Target Correlation Analysis
 
 Several statistical methods were used to examine relationships between gait features and pain outcomes:
 
@@ -162,7 +162,7 @@ Interpretation:
 
 ---
 
-### Target Dependency Analysis
+#### Target Dependency Analysis
 
 Relationships between pain variables were analyzed using **Cramér’s V**.
 
@@ -176,7 +176,7 @@ Interpretation:
 
 ---
 
-### Key EDA Insights
+#### Key EDA Insights
 
 The exploratory analysis provided several insights that influenced model design:
 
