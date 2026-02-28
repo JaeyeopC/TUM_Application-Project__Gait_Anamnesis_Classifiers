@@ -115,16 +115,6 @@ To improve the relationship between input features and prediction targets, diffe
 - **XGBoost model**  
   The ordinal targets were converted into **binary variables (pain vs. no pain)**. This simplification reduces the complexity of the classification task and strengthens the statistical association between biomechanical gait features and the target variables.
 
----
-
-#### Missing Values
-
-Among the **2,603 records**:
-
-- **637 samples contain missing values**
-  - either in the pain targets or in the shoe size feature
-
-These records were handled during preprocessing depending on the modeling experiment.
 
 ---
 
