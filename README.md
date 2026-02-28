@@ -133,9 +133,9 @@ Descriptive statistics were computed for all biomechanical features.
 
 Key observations:
 
-- Most features follow approximately **Gaussian-like distributions**.
-- **Shoe size** is a **discrete variable**.
-- Feature ranges differ significantly, requiring normalization.
+- Most biomechanical features exhibit approximately **Gaussian-like distributions**, indicating that they can be treated as continuous variables.
+- Although **shoe size** is technically discrete, it spans a sufficiently wide range and was therefore handled as a continuous variable in the analysis.
+- Since the feature ranges differ substantially, **feature normalization** was applied prior to model training.
 
 Therefore:
 
