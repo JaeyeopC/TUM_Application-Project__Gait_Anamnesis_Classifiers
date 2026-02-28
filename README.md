@@ -187,23 +187,17 @@ The objective was to maximize validation accuracy using a single train/validatio
 
 The selected hyperparameters control model complexity and generalization:
 
-- `learning_rate`: **0.07**  
-  Controls the contribution of each boosting step. A moderate value allows stable learning while preventing overfitting.
+- `learning_rate`: **0.07**, controlling how much each boosting step contributes to the model and enabling stable learning while reducing overfitting.
 
-- `max_depth`: **9**  
-  Determines the maximum depth of each decision tree, enabling the model to capture complex nonlinear interactions between IMU sensor features.
+- `max_depth`: **9**, limiting the depth of each decision tree while allowing the model to capture nonlinear interactions between IMU sensor features.
 
-- `n_estimators`: **306**  
-  Defines the number of boosting rounds. A sufficiently large number of trees allows the model to refine predictions iteratively.
+- `n_estimators`: **306**, defining the number of boosting rounds used to progressively refine model predictions.
 
-- `subsample`: **0.52**  
-  Specifies the fraction of training samples used for each tree, helping reduce overfitting and improve robustness.
+- `subsample`: **0.52**, using a random subset of training samples for each tree to improve robustness and reduce overfitting.
 
-- `colsample_bytree`: **0.80**  
-  Randomly samples features for each tree to increase model diversity and reduce feature dominance.
+- `colsample_bytree`: **0.80**, randomly sampling a subset of features for each tree to increase model diversity.
 
-- `gamma`: **0.85**  
-  Adds a regularization constraint requiring a minimum loss reduction before further splitting, helping prevent unnecessary tree complexity.
+- `gamma`: **0.85**, requiring a minimum loss reduction before additional tree splits to regularize the model.
 
 These hyperparameters allow the model to balance **model expressiveness and regularization**, which is important when learning temporal patterns encoded in lag-based IMU features.
 
