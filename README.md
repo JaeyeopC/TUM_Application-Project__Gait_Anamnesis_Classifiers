@@ -48,9 +48,7 @@ The dataset contains five gait event labels:
 - 3 — Heel Off  
 - 4 — Toe Off  
 
-The distribution is highly imbalanced.  
-Foot Flat and Toe Off appear most frequently, while Heel Strike is relatively rare.  
-This imbalance later influenced model performance, particularly for the Heel Strike class.
+The distribution is highly imbalanced. Foot Flat and Toe Off appear most frequently, while Heel Strike is relatively rare. This imbalance later influenced model performance, particularly for the Heel Strike class.
 
 **Temporal characteristics**
 
