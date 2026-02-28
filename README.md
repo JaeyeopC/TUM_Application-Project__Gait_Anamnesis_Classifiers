@@ -75,7 +75,6 @@ Targets include:
 - **24 ordinal variables**
   - represent pain severity on a **0–5 scale**
 
-This allows modeling both **pain presence and pain severity** simultaneously. :contentReference[oaicite:2]{index=2}
 
 **Feature distributions**
 
@@ -90,8 +89,7 @@ Examples of features include:
 
 **Missing values**
 
-Among the 2,603 records, **637 samples contain missing values** in either the target variables or the shoe size feature.  
-These missing values were handled during preprocessing depending on the experiment setup. :contentReference[oaicite:3]{index=3}
+Among the 2,603 records, **637 samples contain missing values** in either the target variables or the shoe size feature.  These missing values were handled during preprocessing depending on the experiment setup. 
 
 
 **Feature–target relationships**
@@ -100,8 +98,6 @@ Correlation analysis between gait features and pain outcomes showed that:
 
 - Individual features have **low pairwise correlations (< 0.3)** with pain variables.
 - Pain prediction likely depends on **complex interactions between multiple features** rather than a single dominant variable.
-
-This observation motivated the use of **machine learning models capable of capturing nonlinear relationships**, such as XGBoost and neural networks.
 ---
 
 ## 2. Pain Anamnesis Dataset
