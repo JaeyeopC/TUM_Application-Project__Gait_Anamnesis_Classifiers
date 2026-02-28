@@ -17,107 +17,177 @@ The detailed experimental results are documented in the final report.
 
 ---
 
-## Data 
+## Exploratory Data Analysis (EDA)
 
-### Gait Event Dataset
-
-Before building the models, an exploratory analysis was conducted to understand the structure and characteristics of the IMU sensor data.
-
-**Dataset structure**
-
-- Total rows: **508,446**
-- Collection IDs: **2,324**
-- Each **collection ID corresponds to one walking session**, meaning multiple rows form a continuous time-series sequence. 
-
-Each observation contains:
-
-- 3-axis accelerometer data
-- 3-axis gyroscope data
-- timestamp
-- foot side (left/right)
-- step information
-- gait event label
-
-**Class distribution**
-
-The dataset contains five gait event labels:
-
-- 0 — No Event  
-- 1 — Heel Strike  
-- 2 — Foot Flat  
-- 3 — Heel Off  
-- 4 — Toe Off  
-
-The distribution is highly imbalanced. Foot Flat and Toe Off appear most frequently, while Heel Strike is relatively rare. This imbalance later influenced model performance, particularly for the Heel Strike class.
-
-**Temporal characteristics**
-
-Because the dataset consists of time-series sensor data, temporal dependency between observations was analyzed using the **Autocorrelation Function (ACF)**. The average cutoff lag across collection IDs was approximately **19 time steps**, indicating that recent sensor history strongly affects the current gait phase.  This finding motivated the creation of **lag-based features** for the XGBoost model. 
-
+Before training the models, exploratory data analysis (EDA) was conducted to understand the statistical properties of the datasets and identify patterns relevant for modeling.
 
 ---
 
-### Pain Anamnesis Dataset
+## Gait Event Dataset
 
-The pain anamnesis dataset contains **patient-reported pain information together with gait-derived biomechanical features**.
+### Dataset Structure
 
-**Dataset structure**
+- Total rows: **508,446**
+- Collection IDs: **2,324**
+
+Each **collection ID represents one walking session**, meaning multiple rows together form a continuous IMU time-series sequence recorded from the same participant. :contentReference[oaicite:1]{index=1}
+
+Each observation includes:
+
+- 3-axis accelerometer signals
+- 3-axis gyroscope signals
+- timestamp
+- foot side (left / right)
+- gait event label
+
+---
+
+### Class Distribution
+
+The dataset contains five gait event classes:
+
+| Label | Event |
+|------|------|
+| 0 | No Event |
+| 1 | Heel Strike |
+| 2 | Foot Flat |
+| 3 | Heel Off |
+| 4 | Toe Off |
+
+Event counts in the dataset:
+
+| Event | Count |
+|------|------|
+| No Event | 1,806 |
+| Heel Strike | 44,230 |
+| Foot Flat | 175,126 |
+| Heel Off | 97,929 |
+| Toe Off | 189,335 |
+
+Key observations:
+
+- **Foot Flat** and **Toe Off** dominate the dataset.
+- **Heel Strike** is relatively rare.
+- **No Event** appears very rarely compared to other phases.
+
+This class imbalance explains why some models showed weaker performance on the **Heel Strike** class.
+
+---
+
+### Temporal Dependency Analysis
+
+Because the dataset consists of time-series sensor signals, the **Autocorrelation Function (ACF)** was used to analyze temporal dependencies.
+
+Results:
+
+- Average optimal lag ≈ **19 timesteps**
+
+Interpretation:
+
+- Sensor measurements from the previous **~19 timestamps significantly influence the current gait phase**.
+
+Based on this result:
+
+- **Lag features were created for the XGBoost model**
+- With **6 IMU channels × 19 lags = 114 lag features**
+
+After lag generation:
+
+- Dataset size became approximately **464,590 rows × 116 features**
+
+---
+
+## Pain Anamnesis Dataset
+
+### Dataset Structure
 
 - Total records: **2,603 patients**
 - Input features: **7 biomechanical gait features**
-- Targets: **42 pain-related variables**
+- Targets: **42 pain variables**
 
-Targets include:
+Targets consist of:
 
 - **18 binary variables**
-  - indicate presence of localized pain (Binary)
+  - indicate presence of localized pain
 
 - **24 ordinal variables**
   - represent pain severity on a **0–5 scale**
 
-
-**Feature distributions**
-
-Most biomechanical features show approximately **Gaussian-like distributions**, while **shoe size** is a discrete variable.
-
-Examples of features include:
-
-- lateral deviation during walking
-- static standing deviation
-- heel strike timing
-- shoe size
-
-**Missing values**
-
-Among the 2,603 records, **637 samples contain missing values** in either the target variables or the shoe size feature.  These missing values were handled during preprocessing depending on the experiment setup. 
-
-
-**Feature–target relationships**
-
-Correlation analysis between gait features and pain outcomes showed that:
-
-- Individual features have **low pairwise correlations (< 0.3)** with pain variables.
-- Pain prediction likely depends on **complex interactions between multiple features** rather than a single dominant variable.
----
-
-## 2. Pain Anamnesis Dataset
-
-- **Total patients**: 2,603  
-- **Input features**: 7 biomechanical gait features  
-  - e.g., lateral deviations, heel strike timing, shoe size  
-
-### Target Variables (42 total)
-
-- **18 Binary variables** → localized pain presence (0/1)  
-- **24 Ordinal variables** → pain severity (0–5 scale)  
-
-The dataset allows simultaneous prediction of pain presence and severity.
+This allows the model to predict both **pain presence and pain intensity** simultaneously. :contentReference[oaicite:2]{index=2}
 
 ---
 
-# Task: Gait Event Detection
+### Missing Values
 
-Goal: Classify gait phase from IMU time-series signals.
+Among the **2,603 records**:
+
+- **637 samples contain missing values**
+  - either in the pain targets
+  - or in the shoe size feature
+
+These records were handled during preprocessing depending on the modeling experiment.
+
+---
+
+### Feature Distribution
+
+Descriptive statistics were computed for all biomechanical features.
+
+Key observations:
+
+- Most features follow approximately **Gaussian-like distributions**.
+- **Shoe size** is a **discrete variable**.
+- Feature ranges differ significantly, requiring normalization.
+
+Therefore:
+
+- **Standardization or MinMax scaling** was applied before training machine learning models.
+
+---
+
+### Feature–Target Correlation Analysis
+
+Several statistical methods were used to examine relationships between gait features and pain outcomes:
+
+- **Point-biserial correlation**
+- **Distance correlation**
+- **Mutual information**
+
+Results:
+
+- Most feature–target correlations were **weak (< 0.3)**.
+- No single biomechanical feature strongly predicts pain.
+
+Interpretation:
+
+- Pain prediction likely depends on **complex interactions between multiple gait features** rather than a single variable.
+
+---
+
+### Target Dependency Analysis
+
+Relationships between pain variables were analyzed using **Cramér’s V**.
+
+Results:
+
+- Some pairs of pain variables showed **moderate associations (Cramér’s V > 0.4)**.
+
+Interpretation:
+
+- Certain pain regions tend to **co-occur**, suggesting shared biomechanical or physiological causes.
+
+---
+
+### Key EDA Insights
+
+The exploratory analysis provided several insights that influenced model design:
+
+- The **gait dataset shows strong temporal dependency**, motivating lag features and sequence models.
+- The **gait event classes are imbalanced**, especially for Heel Strike.
+- The **pain dataset shows weak individual correlations**, suggesting the need for models capable of capturing nonlinear interactions.
+- Some **pain targets are correlated**, indicating potential multi-task learning benefits.
+
+These observations motivated the use of both **XGBoost models (with engineered features)** and **neural network models (for complex feature interactions)** in the project.
 
 ---
 
