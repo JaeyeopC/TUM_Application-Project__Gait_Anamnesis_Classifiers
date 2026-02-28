@@ -3,13 +3,11 @@
 ## Project Overview
 
 This project was conducted as part of the TUM Application Project in association with an industry partner.
+
 The main objective was to develop **baseline machine learning models** for two related healthcare tasks:
 
 1. **Gait Event Detection** using IMU sensor time-series data  
 2. **Pain Anamnesis Classification** using biomechanical gait-derived features
-
-1. **Gait Event Detection** using IMU sensor time-series data  
-2. **Pain Anamnesis Classification** using biomechanical gait-derived features  
 
 Two modeling strategies were implemented and compared:
 
