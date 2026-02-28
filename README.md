@@ -27,7 +27,7 @@ Before building the models, an exploratory analysis was conducted to understand 
 
 - Total rows: **508,446**
 - Collection IDs: **2,324**
-- Each **collection ID corresponds to one walking session**, meaning multiple rows form a continuous time-series sequence. :contentReference[oaicite:0]{index=0}
+- Each **collection ID corresponds to one walking session**, meaning multiple rows form a continuous time-series sequence. 
 
 Each observation contains:
 
