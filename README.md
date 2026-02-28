@@ -179,17 +179,25 @@ Instead of using raw sequences, we transformed time-series data into tabular for
 
 ### Hyperparameter Optimization
 
-- **Optuna** used for automated hyperparameter search  
-  - max_depth  
-  - learning_rate  
-  - n_estimators  
-  - subsample  
-  - colsample_bytree  
+- **Optuna** was used for resource-efficient hyperparameter optimization based on Bayesian optimization.  
+  Instead of performing exhaustive grid search, Optuna explores the search space adaptively by learning from previous trials and focusing on promising regions.
 
-### Model Interpretation
+The following hyperparameters were tuned:
 
-- **SHAP analysis** used to interpret feature importance  
-- Identified which sensor axes and lag steps contributed most to event prediction  
+  - `max_depth`  
+    Controls the maximum depth of individual trees, balancing model complexity and overfitting.
+
+  - `learning_rate`  
+    Shrinks the contribution of each tree to improve generalization.
+
+  - `n_estimators`  
+    Determines the number of boosting rounds (trees).
+
+  - `subsample`  
+    Fraction of training samples used per tree, helping reduce overfitting.
+
+  - `colsample_bytree`  
+    Fraction of features randomly sampled for each tree, improving robustness and generalization.
 
 ---
 
@@ -246,9 +254,9 @@ Goal: Predict patient pain profile using gait-derived features.
 
 ### Model Interpretation
 
-- **SHAP summary plots and dependence plots** used  
-- Identified biomechanical features influencing specific pain regions  
-- Provided interpretable relationships between gait deviations and pain  
+- **SHAP summary plots and dependence plots** used to
+- Identify biomechanical features influencing specific pain regions  
+- Provide interpretable relationships between gait deviations and pain  
 
 ---
 
@@ -280,14 +288,5 @@ Since pain inputs are structured (not sequential), a **multi-output neural netwo
 - ~1.4 MAE for ordinal pain severity  
 - Multi-task learning improved consistency and performance  
 
----
-
-# Summary
-
-- **LSTM** performs strongly for sequential gait event detection  
-- **XGBoost + lag features** provides competitive performance with high interpretability  
-- **Optuna** improves model performance through automated tuning  
-- **SHAP** enables clinical interpretability of gait–pain relationships  
-- Multi-task neural networks effectively handle mixed binary + ordinal outputs  
 
 This project demonstrates how wearable gait data can be leveraged to build automated, interpretable healthcare prediction systems.
