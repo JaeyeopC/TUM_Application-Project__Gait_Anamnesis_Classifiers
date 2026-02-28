@@ -175,66 +175,82 @@ Two different modeling approaches were implemented.
 ## XGBoost
 
 ### Method
+Lag-based feature engineering was used to convert IMU time-series into tabular features for XGBoost.
+- ACF-based lag selection (average optimal lag ≈ 19 timesteps)
+- Lag feature generation (6 IMU channels × 19 lags = 114 lag features)
+- MinMax normalization
+- Group-aware splitting to avoid leakage across collection IDs (GroupShuffleSplit)
 
-Instead of using raw sequences, we transformed time-series data into tabular form using **lag-based feature engineering**.
+### Hyperparameter Optimization (Optuna)
+Optuna was used for resource-efficient hyperparameter optimization based on Bayesian optimization (TPE sampler).  
+The objective was to maximize validation accuracy using a single train/validation split.
 
-- Autocorrelation (ACF) used to determine optimal lag size  
-- Past sensor values added as lag features  
-- MinMax scaling applied  
-- GroupShuffleSplit used to avoid leakage across collection IDs  
+**Final hyperparameters (Optuna):**
+- `learning_rate`: 0.07
+- `max_depth`: 9
+- `n_estimators`: 306
+- `subsample`: 0.52
+- `colsample_bytree`: 0.80
+- `gamma`: 0.85
 
-### Hyperparameter Optimization
+### Result
+- **Test accuracy:** ≈ 92%
+- **Weighted F1-score:** ≈ 0.92
 
-- **Optuna** was used for resource-efficient hyperparameter optimization based on Bayesian optimization.  
-  Instead of performing exhaustive grid search, Optuna explores the search space adaptively by learning from previous trials and focusing on promising regions.
+Per-class performance highlights:
+- Strong performance on frequent classes (e.g., **Foot Flat**, **Toe Off**) with scores around ~0.90+
+- Lower performance on the rare class **Heel Strike**:
+  - Precision: 0.71
+  - Recall: 0.53
+  - F1-score: 0.61
 
-The following hyperparameters were selected and tuned:
+Collection-level evaluation:
+- ~74% of test collection IDs achieved **>90% accuracy** (342 / 465 collection IDs)
 
-  - `max_depth`  
-    Controls the maximum depth of individual trees, balancing model complexity and overfitting.
+Distribution shift analysis (**Jensen–Shannon Divergence, JSD**) was used to quantify the similarity between the predicted and true gait phase distributions:
 
-  - `learning_rate`  
-    Shrinks the contribution of each tree to improve generalization.
+- JSD excluding Heel Strike: **0.006**
+- JSD including Heel Strike: **0.12**
 
-  - `n_estimators`  
-    Determines the number of boosting rounds (trees).
-
-  - `subsample`  
-    Fraction of training samples used per tree, helping reduce overfitting.
-
-  - `colsample_bytree`  
-    Fraction of features randomly sampled for each tree, improving robustness and generalization.
-
+This result indicates that most distribution mismatch is caused by the Heel Strike phase, while the remaining gait phases are predicted with highly similar distributions.
 ---
 
 ## LSTM
 
 ### Method
 
-Raw IMU sequences were directly used as input to an LSTM network.
+Raw IMU sequences were directly used as input to an LSTM network in order to capture temporal dependencies in gait signals.
 
-- Sliding window segmentation (2–3 seconds per window)  
-- MinMax normalization  
-- Sequence labeling approach  
+- Sliding window segmentation (**2–3 seconds per window**)
+- Sequence-based classification
+- MinMax normalization applied to all IMU channels
 
 ### Architecture
 
-- 3 stacked LSTM layers  
-- 128 hidden units each  
-- Dropout for regularization  
-- Fully connected softmax output  
+The model consists of stacked recurrent layers designed to capture temporal patterns in gait signals.
+
+- **3 stacked LSTM layers**
+- **128 hidden units per layer**
+- **Dropout** applied for regularization
+- **Fully connected layer with softmax activation** for multi-class gait phase prediction
 
 ### Training
 
-- Optimizer: Adam (lr=0.001)  
-- 70/15/15 train-validation-test split  
-- Early stopping  
+- **Optimizer:** Adam (learning rate = 0.001)
+- **Loss function:** Cross-entropy loss
+- **Train / validation / test split:** 70 / 15 / 15
+- **Early stopping** used to prevent overfitting
 
 ### Result
 
-- ~91% overall test accuracy  
-- Strong performance on frequent classes (Foot Flat, Toe Off)  
-- Lower recall for rare class (Heel Strike)
+- **Overall test accuracy:** ~91%
+
+Performance characteristics:
+
+- Strong performance on frequent classes such as **Foot Flat** and **Toe Off**
+- Lower recall for the rare class **Heel Strike**, similar to the XGBoost model due to class imbalance
+
+Compared to the XGBoost approach, the LSTM model directly learns temporal dependencies from raw IMU sequences, which allows it to achieve competitive performance without manual lag feature engineering.
 
 ---
 
