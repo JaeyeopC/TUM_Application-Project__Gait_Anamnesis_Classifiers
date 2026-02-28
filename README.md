@@ -103,15 +103,16 @@ After lag generation:
 - Input features: **7 biomechanical gait features**
 - Targets: **42 pain variables**
 
-Targets consist of:
+The pain anamnesis dataset contains 42 target variables:
 
-- **18 binary variables**
-  - indicate presence of localized pain
+- 18 binary targets → pain presence (0 / 1)
+- 24 ordinal targets → pain severity (0–5)
 
-- **24 ordinal variables**
-  - represent pain severity on a **0–5 scale**
+To increase the statistical association between features and target variables, different target processing strategies were applied depending on the modeling approach.
 
-This allows the model to predict both **pain presence and pain intensity** simultaneously. 
+For the neural network model, the original target structure was preserved. The model was designed as a multi-task learning framework that simultaneously predicts binary pain presence and ordinal pain severity.
+
+For the XGBoost approach, ordinal targets were converted into binary variables (pain vs. no pain). This transformation simplifies the prediction task and helps increase the effective association between the biomechanical gait features and the target variables.
 
 ---
 
@@ -145,10 +146,18 @@ Therefore:
 #### Feature–Target Correlation Analysis
 
 Several statistical methods were used to examine relationships between gait features and pain outcomes:
+To investigate the statistical relationship between biomechanical gait features and pain targets, several dependency measures were used:
 
-- **Point-biserial correlation**
-- **Distance correlation**
-- **Mutual information**
+- **Point-biserial correlation**  
+  Evaluates the relationship between continuous input features and binary pain indicators.
+
+- **Distance correlation**  
+  Captures both linear and nonlinear dependencies between variables.
+
+- **Mutual information**  
+  Measures the amount of shared information between features and targets without assuming any specific functional relationship.
+
+These analyses indicated that individual feature–target relationships were generally weak, suggesting that pain outcomes are influenced by complex interactions among multiple gait features rather than a single dominant variable.
 
 Results:
 
