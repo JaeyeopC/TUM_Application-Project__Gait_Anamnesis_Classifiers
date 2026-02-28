@@ -1,79 +1,242 @@
-# Machine Learning for Gait Event Detection & Pain Anamnesis Classification
 
-## Project Summary
+# Gait Event Detection & Pain Anamnesis Classification (TUM Application Project)
 
-This project was developed for the course **Application Project [IN2328]** at **Technische Universität München**, conducted in association with **Eversion Technologies GmbH**, a company specializing in wearable gait analysis and biomechanical assessment systems.
+## Project Overview
+This project implements and compares machine learning models that:
+- Detect **gait events** from wearable **6‑axis IMU sensor time‑series data** (accelerometer + gyroscope).
+- Predict **pain anamnesis outcomes** (binary and ordinal) using **biomechanical features derived from gait**.
 
-The project was supervised by **Pietro Fantini** from the *Lehrstuhl für Technologie- und Innovationsmanagement*.
+Two modeling approaches were developed and compared:
+- **LSTM (sequence modeling)** for time‑series gait event detection.
+- **XGBoost (lagged feature approach)** for structured time‑series learning.
 
-The objective of this project was to develop machine learning models that link biomechanical gait patterns to clinically relevant pain information. Two main tasks were addressed:
-
-1. **Gait event detection** from wearable IMU sensor data  
-2. **Pain anamnesis classification** using gait-derived biomechanical features  
+The repository separates final artifacts (reports, notebooks, trained models, and experiment results) into different branches.
 
 ---
 
-## Repository Structure
+## Repository Branches
+- **LSTM_final_models**
+  - LSTM-based gait event classification
+  - Neural network models for pain anamnesis prediction (binary and multi-task)
+  - Includes notebooks and data files
 
-The repository is organized into dedicated branches to separate documentation, model development, and finalized implementations.
+- **XGBoost_final_models**
+  - Final XGBoost models for gait event detection and pain anamnesis
+  - Optuna hyperparameter tuning
+  - Saved models and evaluation reports
 
-- **main**  
-  Contains the final project report and documentation.
+- **XGBoost_Gait_Experiment**
+  - Experimental branch for feature engineering and tuning experiments for gait event detection
 
-- **LSTM_final_models**  
-  Includes the implemented and trained models based on LSTM architectures for gait event detection and pain anamnesis classification.
-
-- **XGBoost_final_models**  
-  Contains the finalized XGBoost models, including trained models and evaluation outputs.
-
-- **XGBoost_Gait_Experiment**  
-  Development and experimentation branch for XGBoost-based gait event detection, including feature engineering, model tuning, and exploratory analysis.
 ---
 
-## Data
+## Project Objectives
 
-Two structured datasets were used:
+### 1. Gait Event Detection
+Classify gait events from **IMU sensor signals embedded in shoe insoles**.
+
+Target classes include:
+- Heel Strike
+- Foot Flat
+- Heel Off
+- Toe Off
+
+### 2. Pain Anamnesis Classification
+Predict patient pain questionnaire results using **7 biomechanical features extracted from gait**.
+
+Targets include:
+- **18 binary pain indicators (CLP)**
+- **24 ordinal pain severity variables (0–5 scale)**
+
+---
+
+## Datasets
 
 ### Gait Event Dataset
-Collected using 6-axis IMU sensors embedded in instrumented insoles.  
-Each time-series sample contains:
+- **2,324 collection IDs**
+- **508,446 rows**
+- **8 columns** including:
+  - collection_id
+  - timestamps
+  - 6‑axis IMU sensor measurements
+  - gait phase labels
 
-- 3-axis acceleration and 3-axis gyroscope signals  
-- timestamps and step information  
-- foot side (left / right)  
-- labeled gait events (e.g., heel strike, foot flat, heel off, toe off)
+Class distribution:
 
-The dataset captures full walking cycles across multiple participants and serves as ground truth for event detection.
+| Event | Count |
+|------|------|
+| No Event | 1,806 |
+| Heel Strike | 44,230 |
+| Foot Flat | 175,126 |
+| Heel Off | 97,929 |
+| Toe Off | 189,335 |
+
+The dataset is **highly imbalanced**.
 
 ### Pain Anamnesis Dataset
-Derived from standardized patient questionnaires combined with gait-based biomechanical measurements.  
-It includes:
+- **2,603 patient records**
+- **7 input features**
+- **42 targets**
+  - 18 binary
+  - 24 ordinal (0–5 scale)
 
-- movement and posture-related features extracted from gait analysis  
-- binary indicators of localized pain  
-- ordinal pain severity scores (0–5 scale) across multiple body regions  
-
-This dataset enables modeling both the presence and intensity of pain.
-
-
-## Methods
-
-For gait event detection, sequence-based deep learning models (LSTM) were trained on raw IMU time-series data to identify gait phases in real time.  
-As a complementary approach, XGBoost models with engineered temporal features and automated hyperparameter optimization (Optuna) were applied for comparison.
-
-For pain analysis, a multi-output neural network was designed to jointly predict:
-
-- binary pain presence  
-- ordinal pain severity levels  
-
-This multi-task learning framework captures relationships between biomechanical patterns and subjective pain reports.
-
-To improve model interpretability, explainable AI techniques were applied. In particular, **SHAP (SHapley Additive exPlanations)** was used to analyze feature contributions and identify biomechanical factors most strongly associated with specific pain outcomes. This enabled transparent interpretation of model predictions and supported clinically meaningful insights.
-
-
-## Outcome
-
-The project compares deep learning and tree-based approaches in terms of predictive performance, interpretability, and practical deployment potential.  
-Results show that data-driven modeling can reliably detect gait events, provide meaningful predictions of patient-reported pain, and offer interpretable insights into biomechanical risk factors, supporting the development of automated and scalable clinical assessment tools.
+637 records contain missing values.
 
 ---
+
+## Feature Engineering
+
+### LSTM Pipeline
+- Continuous IMU streams segmented into **sequence windows**
+- Example window length: **30 timesteps**
+- Inputs:
+  - 3-axis gyroscope
+  - 3-axis accelerometer
+- **Min‑Max normalization**
+- Sequence classification using the final timestep label
+
+### XGBoost Pipeline
+Time‑series data transformed into supervised learning features.
+
+Key idea:
+
+event(t) = function(sensor(t), sensor(t−1), ... sensor(t−19))
+
+Steps:
+1. Remove missing values
+2. Remove **No Event** samples
+3. Convert labels to 4‑class classification
+4. Determine lag size using **Autocorrelation Function (ACF)**
+5. Final lag size: **19**
+
+Feature count:
+
+6 sensors × 19 lags ≈ **114 lagged features**
+
+---
+
+## Models
+
+### LSTM Gait Event Classifier
+
+Architecture:
+- 3 LSTM layers
+- Hidden dimension: 128
+- Dropout: 0.5
+- Fully connected output layer
+
+Training setup:
+- Train / Validation / Test split: **70 / 15 / 15**
+- Batch size: **128**
+- Learning rate: **0.001**
+- Optimizer: **Adam**
+- Epochs: **10**
+
+---
+
+### XGBoost Gait Event Model
+
+Model:
+
+XGBClassifier(
+objective="multi:softmax",
+eval_metric="mlogloss"
+)
+
+Hyperparameter tuning:
+- **Optuna TPE sampler**
+- **50 trials**
+- Best validation accuracy ≈ **0.914**
+
+Key parameters tuned:
+- max_depth
+- learning_rate
+- n_estimators
+- subsample
+- colsample_bytree
+- gamma
+- min_child_weight
+
+---
+
+### Neural Networks for Pain Anamnesis
+
+Two architectures were tested.
+
+#### Binary‑Only Neural Network
+- 7 hidden layers
+- BatchNorm + LeakyReLU + Dropout
+- Optimizer: AdamW
+- Epochs: 50
+
+#### Multi‑Task Neural Network
+Shared trunk + multiple output heads.
+
+Components:
+- Shared layers (64 → 32 → 32)
+- Binary classification head
+- Ordinal regression heads using **CORAL method**
+
+Loss function:
+- Binary Cross‑Entropy
+- CORAL ordinal loss
+
+---
+
+## Results
+
+### Gait Event Detection
+
+| Model | Accuracy | Notes |
+|------|------|------|
+| LSTM | ~0.91 | Rare classes difficult |
+| XGBoost | ~0.921 | Best overall performance |
+
+Heel Strike remained the hardest class due to imbalance.
+
+### Pain Anamnesis Prediction
+
+| Model | Binary Accuracy | Additional Metric |
+|------|------|------|
+| Binary NN | ~0.78 | — |
+| Multi‑Task NN | ~0.80 | MAE ≈ 1.4 |
+| XGBoost | mean accuracy ≈ 0.668 | mean F1 ≈ 0.285 |
+
+Performance varied significantly between targets.
+
+---
+
+## Limitations
+
+1. **Class imbalance**
+   - Rare gait events reduce recall.
+
+2. **Preprocessing artifacts not saved**
+   - Scalers and encoders were not stored with the models.
+
+3. **Data split differences**
+   - XGBoost used group‑based splitting.
+   - LSTM used random splits, which may risk data leakage.
+
+4. **Limited features**
+   - Only 7 biomechanical inputs for predicting 42 pain targets.
+
+---
+
+## Future Work
+
+Recommended improvements:
+
+1. Save **scalers and encoders** with model checkpoints.
+2. Improve **rare class detection** using resampling or weighted loss.
+3. Use **group‑based splitting** consistently.
+4. Expand biomechanical features for pain prediction.
+
+---
+
+## Repository
+
+GitHub:
+https://github.com/JaeyeopC/TUM_Application-Project__Gait_Anamnesis_Classifiers
+
+This repository contains the notebooks, datasets, and trained models used in the TUM Application Project.
