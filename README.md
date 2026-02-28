@@ -38,8 +38,6 @@ Each observation includes:
 - foot side (left / right)
 - gait event label
 
----
-
 #### Temporal Dependency Analysis
 
 Because the dataset consists of time-series sensor signals, the **Autocorrelation Function (ACF)** was used to analyze temporal dependencies.
@@ -115,9 +113,6 @@ To improve the relationship between input features and prediction targets, diffe
 - **XGBoost model**  
   The ordinal targets were converted into **binary variables (pain vs. no pain)**. This simplification reduces the complexity of the classification task and strengthens the statistical association between biomechanical gait features and the target variables.
 
-
----
-
 #### Feature Distribution
 
 Descriptive statistics were computed for all biomechanical features.
@@ -131,8 +126,6 @@ Key observations:
 Therefore:
 
 - **Standardization or MinMax scaling** was applied before training machine learning models.
-
----
 
 #### Feature–Target Correlation Analysis
 
@@ -159,8 +152,6 @@ Interpretation:
 
 - Pain prediction likely depends on **complex interactions between multiple gait features** rather than a single variable.
 
----
-
 #### Target Dependency Analysis
 
 Relationships between pain variables were analyzed using **Cramér’s V**.
@@ -172,19 +163,6 @@ Results:
 Interpretation:
 
 - Certain pain regions tend to **co-occur**, suggesting shared biomechanical or physiological causes.
-
----
-
-#### Key EDA Insights
-
-The exploratory analysis provided several insights that influenced model design:
-
-- The **gait dataset shows strong temporal dependency**, motivating lag features and sequence models.
-- The **gait event classes are imbalanced**, especially for Heel Strike.
-- The **pain dataset shows weak individual correlations**, suggesting the need for models capable of capturing nonlinear interactions.
-- Some **pain targets are correlated**, indicating potential multi-task learning benefits.
-
-These observations motivated the use of both **XGBoost models (with engineered features)** and **neural network models (for complex feature interactions)** in the project.
 
 ---
 
