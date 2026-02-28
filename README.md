@@ -21,8 +21,6 @@ The detailed experimental results are documented in the final report.
 
 Before training the models, exploratory data analysis (EDA) was conducted to understand the statistical properties of the datasets and identify patterns relevant for modeling.
 
----
-
 ## Gait Event Dataset
 
 ### Dataset Structure
