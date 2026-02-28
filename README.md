@@ -40,38 +40,6 @@ Each observation includes:
 
 ---
 
-#### Class Distribution
-
-The dataset contains five gait event classes:
-
-| Label | Event |
-|------|------|
-| 0 | No Event |
-| 1 | Heel Strike |
-| 2 | Foot Flat |
-| 3 | Heel Off |
-| 4 | Toe Off |
-
-Event counts in the dataset:
-
-| Event | Count |
-|------|------|
-| No Event | 1,806 |
-| Heel Strike | 44,230 |
-| Foot Flat | 175,126 |
-| Heel Off | 97,929 |
-| Toe Off | 189,335 |
-
-Key observations:
-
-- **Foot Flat** and **Toe Off** dominate the dataset.
-- **Heel Strike** is relatively rare.
-- **No Event** appears very rarely compared to other phases.
-
-This class imbalance explains why some models showed weaker performance on the **Heel Strike** class.
-
----
-
 #### Temporal Dependency Analysis
 
 Because the dataset consists of time-series sensor signals, the **Autocorrelation Function (ACF)** was used to analyze temporal dependencies.
@@ -99,20 +67,53 @@ After lag generation:
 
 #### Dataset Structure
 
-- Total records: **2,603 patients**
-- Input features: **7 biomechanical gait features**
-- Targets: **42 pain variables**
+- **Total records:** 2,603 patients  
+- **Input features:** 7 biomechanical gait features  
+- **Targets:** 42 pain variables  
 
-The pain anamnesis dataset contains 42 target variables:
+Each record corresponds to one patient and contains biomechanical features derived from gait analysis using IMU sensors embedded in instrumented insoles.
 
-- 18 binary targets → pain presence (0 / 1)
-- 24 ordinal targets → pain severity (0–5)
+#### Feature Variables
 
-To increase the statistical association between features and target variables, different target processing strategies were applied depending on the modeling approach.
+The dataset contains **seven biomechanical features** describing characteristics of a patient's walking pattern and posture:
 
-For the neural network model, the original target structure was preserved. The model was designed as a multi-task learning framework that simultaneously predicts binary pain presence and ordinal pain severity.
+1. **Left movement deviation**  
+   Lateral deviation of the movement trajectory on the left side during walking.
 
-For the XGBoost approach, ordinal targets were converted into binary variables (pain vs. no pain). This transformation simplifies the prediction task and helps increase the effective association between the biomechanical gait features and the target variables.
+2. **Right movement deviation**  
+   Lateral deviation of the movement trajectory on the right side during walking.
+
+3. **Resting deviation**  
+   Postural deviation measured while the patient is standing still.
+
+4. **Average step length (left)**  
+   Average step length of the left foot during walking.
+
+5. **Average step length (right)**  
+   Average step length of the right foot during walking.
+
+6. **Average heel strike timing**  
+   Temporal characteristic of the gait cycle describing heel strike timing during walking.
+
+7. **Shoe size**  
+   Patient’s shoe size, included as a proxy for foot length which may influence gait mechanics and pressure distribution.
+
+#### Target Variables
+
+The pain anamnesis dataset contains **42 target variables**:
+
+- **18 binary variables** → indicate the presence or absence of localized pain (0 / 1)  
+- **24 ordinal variables** → represent pain severity levels on a **0–5 scale**
+
+#### Target Processing for Modeling
+
+To improve the relationship between input features and prediction targets, different target processing strategies were applied depending on the modeling approach.
+
+- **Neural Network (LSTM-based model)**  
+  The original target structure was preserved. The model was designed as a **multi-task learning framework** that simultaneously predicts binary pain presence and ordinal pain severity.
+
+- **XGBoost model**  
+  The ordinal targets were converted into **binary variables (pain vs. no pain)**. This simplification reduces the complexity of the classification task and strengthens the statistical association between biomechanical gait features and the target variables.
 
 ---
 
