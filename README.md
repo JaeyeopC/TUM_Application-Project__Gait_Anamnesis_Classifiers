@@ -13,8 +13,7 @@ Two modeling strategies were implemented and compared:
 - **XGBoost (tree-based gradient boosting)**
 - **LSTM / Deep Neural Networks**
 
-The detailed experimental results are documented in the final report. :contentReference[oaicite:0]{index=0}
-
+The detailed experimental results are documented in the final report. 
 
 ---
 
@@ -55,7 +54,7 @@ This imbalance later influenced model performance, particularly for the Heel Str
 
 **Temporal characteristics**
 
-Because the dataset consists of time-series sensor data, temporal dependency between observations was analyzed using the **Autocorrelation Function (ACF)**. The average cutoff lag across collection IDs was approximately **19 time steps**, indicating that recent sensor history strongly affects the current gait phase.  This finding motivated the creation of **lag-based features** for the XGBoost model. :contentReference[oaicite:1]{index=1}
+Because the dataset consists of time-series sensor data, temporal dependency between observations was analyzed using the **Autocorrelation Function (ACF)**. The average cutoff lag across collection IDs was approximately **19 time steps**, indicating that recent sensor history strongly affects the current gait phase.  This finding motivated the creation of **lag-based features** for the XGBoost model. 
 
 
 ---
