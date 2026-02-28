@@ -185,13 +185,28 @@ Lag-based feature engineering was used to convert IMU time-series into tabular f
 Optuna was used for resource-efficient hyperparameter optimization based on Bayesian optimization (TPE sampler).  
 The objective was to maximize validation accuracy using a single train/validation split.
 
-**Final hyperparameters (Optuna):**
-- `learning_rate`: 0.07
-- `max_depth`: 9
-- `n_estimators`: 306
-- `subsample`: 0.52
-- `colsample_bytree`: 0.80
-- `gamma`: 0.85
+The selected hyperparameters control model complexity and generalization:
+
+- `learning_rate`: **0.07**  
+  Controls the contribution of each boosting step. A moderate value allows stable learning while preventing overfitting.
+
+- `max_depth`: **9**  
+  Determines the maximum depth of each decision tree, enabling the model to capture complex nonlinear interactions between IMU sensor features.
+
+- `n_estimators`: **306**  
+  Defines the number of boosting rounds. A sufficiently large number of trees allows the model to refine predictions iteratively.
+
+- `subsample`: **0.52**  
+  Specifies the fraction of training samples used for each tree, helping reduce overfitting and improve robustness.
+
+- `colsample_bytree`: **0.80**  
+  Randomly samples features for each tree to increase model diversity and reduce feature dominance.
+
+- `gamma`: **0.85**  
+  Adds a regularization constraint requiring a minimum loss reduction before further splitting, helping prevent unnecessary tree complexity.
+
+These hyperparameters allow the model to balance **model expressiveness and regularization**, which is important when learning temporal patterns encoded in lag-based IMU features.
+
 
 ### Result
 - **Test accuracy:** ≈ 92%
@@ -275,25 +290,36 @@ This approach enables interpretable models while handling multiple pain predicti
 
 ### Hyperparameter Optimization
 
-Hyperparameters were optimized using **Optuna**, which performs efficient Bayesian optimization using the **Tree-structured Parzen Estimator (TPE)** sampler.
+Hyperparameters were optimized using **Optuna**, which performs Bayesian optimization using the **Tree-structured Parzen Estimator (TPE)** sampler.  
+Each pain target was trained as an independent model, and Optuna searched for hyperparameters that maximized **validation accuracy**.
 
-Key hyperparameters tuned include:
+The optimization also addressed **class imbalance**, which was common across many pain variables.
 
-- `max_depth`
-- `learning_rate`
-- `n_estimators`
-- `subsample`
-- `colsample_bytree`
-- `scale_pos_weight`
+Key observations from the optimization results:
 
-Additionally, **decision threshold optimization** was applied for each pain target to improve classification performance under class imbalance.
+- `max_depth` was typically optimized to **≈ 4**, controlling model complexity and preventing overfitting.
+- `n_estimators` centered around **≈ 655 trees**, with values ranging from **339 to 799** across different target models.
+- `learning_rate`, `subsample`, and `colsample_bytree` were tuned within predefined ranges to balance model stability and generalization.
+- `scale_pos_weight` was adjusted to compensate for **imbalanced pain labels**.
 
-Instead of using the default probability threshold (**0.5**), the optimal threshold was selected using **Youden’s J statistic**, defined as:
+In addition to hyperparameter tuning, **decision threshold optimization** was performed.
+
+Instead of using the default probability threshold (**0.5**), the optimal threshold for each target was selected using **Youden’s J statistic**:
 
 J = Sensitivity + Specificity − 1
 
-The threshold that maximized **Youden’s J** on the validation set was chosen for each pain variable.  
-This approach identifies the decision boundary that best balances **true positive rate (sensitivity)** and **true negative rate (specificity)**, which is particularly useful in medical classification tasks.
+The threshold that maximized **Youden’s J** on the validation set was selected.  
+This helped balance **false positives and false negatives**, which is particularly important in medical classification tasks.
+
+### Results
+
+The final XGBoost models achieved the following performance:
+
+- **Binary pain prediction accuracy:** ~78%
+- **Average ROC-AUC across targets:** ~0.74
+
+Accuracy was used to measure the overall correctness of pain presence predictions across all targets.  
+Additionally, **ROC-AUC** was evaluated because many pain labels are **imbalanced**, and ROC-AUC provides a threshold-independent measure of the model's ability to distinguish between pain and no-pain cases.
 
 ### Model Interpretation
 
