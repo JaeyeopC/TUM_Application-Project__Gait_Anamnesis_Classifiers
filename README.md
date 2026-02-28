@@ -17,7 +17,7 @@ The detailed experimental results are documented in the final report.
 
 ---
 
-## Exploratory Data Analysis (EDA)
+## Data 
 
 ### Gait Event Dataset
 
