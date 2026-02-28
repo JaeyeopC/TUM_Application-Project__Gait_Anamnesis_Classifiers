@@ -276,12 +276,13 @@ Goal: Predict patient pain profile using gait-derived biomechanical features.
 
 The XGBoost model was applied to structured biomechanical gait features to predict pain-related targets.
 
-- **7 biomechanical gait features** used as input  
-- Each pain variable modeled as an **independent classification task**  
-- Ordinal pain scores (0–5) converted to **binary indicators (pain vs. no pain)** to simplify the prediction task  
-- **Feature standardization** applied before training  
+- **7 biomechanical gait features** were used as input variables.
+- A total of **42 pain-related targets** were modeled, and each pain variable was trained as an **independent binary classification model**.
+- To manage the large number of targets efficiently, a **custom wrapper class was implemented to train and manage multiple XGBoost models within a unified framework**.
+- Ordinal pain scores (0–5) were converted into **binary indicators (pain vs. no pain)** to simplify the prediction task.
+- Feature standardization was applied before training.
 
-This approach enables interpretable models while handling multiple pain prediction tasks independently.
+This approach allows multiple pain prediction tasks to be handled within a single modeling pipeline while keeping each model specialized for its corresponding target variable. :contentReference[oaicite:0]{index=0}
 
 ### Hyperparameter Optimization
 
