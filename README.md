@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project was conducted as part of the TUM Application Project in association with an industry partner.
+This project was conducted as part of the TUM Application Project[IN2328] in association with an industry partner.
 
 The main objective was to develop **baseline machine learning models** for two related healthcare tasks:
 
